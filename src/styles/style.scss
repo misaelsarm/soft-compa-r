@@ -2,3 +2,20 @@
 @import "base";
 @import "variables";
 @import "login";
+@import "navbar";
+@import "sucursales";
+@import "menu";
+
+body {
+    box-sizing: border-box;
+    overflow-x: hidden;
+    background-color: #f8f6f6;
+}
+
+.main-container {
+    transform: translate(65px, 65px);
+    position: relative;
+    height: auto;
+    width: calc(100% - 65px);
+    padding: 20px;
+}

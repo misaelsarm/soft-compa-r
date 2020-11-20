@@ -5,6 +5,7 @@ import {
     Switch
 } from "react-router-dom";
 import { Login } from '../components/auth/Login';
+import { NavRouter } from './NavRouter';
 
 export const AppRouter = () => {
     return (
@@ -13,6 +14,7 @@ export const AppRouter = () => {
                 <Switch>
 
                     <Route path="/login" component={Login} exact></Route>
+                    <Route path="/" component={NavRouter}></Route>
                 </Switch>
             </div>
         </Router>

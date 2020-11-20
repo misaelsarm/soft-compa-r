@@ -2,17 +2,23 @@ import React, { useState } from 'react'
 import { Form, Input, Button, Row, Col, message } from 'antd';
 import { Link } from 'react-router-dom';
 import restaurante from '../../assets/restaurante.jpg';
+import { useDispatch } from 'react-redux';
+import { startLoginEmailPassword } from '../../actions/auth';
 
 
 export const Login = () => {
 
+    const dispatch = useDispatch()
+
     const [resetPassword, setResetPassword] = useState(false)
-    const onFinish = ({ email, password }) => {
-        /* if (!password) {
-            sendEmail(email)
+    const onFinish = ({ correo, contrasena }) => {
+        
+        if (!contrasena) {
+            sendEmail(correo)
         } else {
-            dispatch(startLoginEmailPassword(email, password))
-        } */
+            console.log('finish')
+            dispatch(startLoginEmailPassword(correo, contrasena))
+        }
     };
 
     const sendEmail = (email) => {

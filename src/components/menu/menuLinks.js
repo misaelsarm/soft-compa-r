@@ -3,26 +3,26 @@ export const menuLinks = [
     {
         route: 'pagos-renta',
         routeName: 'Pagos de renta',
-        icon: ''
+        icon: 'attach_money'
     },
     {
         route: 'ganancias-diarias',
         routeName: 'Ganancias diarias',
-        icon: ''
+        icon: 'point_of_sale'
     },
     {
         route: 'mercancia',
         routeName: 'Mercancia',
-        icon: ''
+        icon: 'local_offer'
     },
     {
         route: 'empleados',
         routeName: 'Empleados',
-        icon: ''
+        icon: 'people_outline'
     },
     {
         route: 'proveedores',
         routeName: 'Proveedores',
-        icon: ''
+        icon: 'assignment_ind'
     },
 ]

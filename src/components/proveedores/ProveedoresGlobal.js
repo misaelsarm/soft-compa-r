@@ -1,8 +1,7 @@
 import { Table } from 'antd'
 import React from 'react'
 
-export const Usuarios = () => {
-
+export const ProveedoresGlobal = () => {
 
     const columns = [
         {
@@ -16,14 +15,14 @@ export const Usuarios = () => {
             key: 'name',
         },
         {
-            title: 'Sucursal',
-            dataIndex: 'sucursal',
-            key: 'sucursal',
+            title: 'Direccion',
+            dataIndex: 'direccion',
+            key: 'direccion',
         },
         {
-            title: 'Tipo de usuario',
-            dataIndex: 'userType',
-            key: 'userType',
+            title: 'Empresa',
+            dataIndex: 'empresa',
+            key: 'empresa',
         },
         {
             title: 'Status',
@@ -39,10 +38,9 @@ export const Usuarios = () => {
         },
     ]
 
-
     return (
         <div>
-            <h2>Usuarios</h2>
+            <h2>Proveedores | Global</h2>
             <Table columns={columns}></Table>
         </div>
     )

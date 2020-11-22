@@ -2,8 +2,11 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Menu, Dropdown } from 'antd';
 import { DownOutlined, SolutionOutlined, TeamOutlined, HomeOutlined, ShopOutlined, TagsOutlined, FileDoneOutlined } from '@ant-design/icons';
+import { useSelector } from 'react-redux';
 
 export const NavBar = () => {
+
+    const { name } = useSelector(state => state.auth)
 
     const signout = async () => {
         /* await db.collection('users').doc(uid).update({
@@ -22,12 +25,8 @@ export const NavBar = () => {
     return (
         <>
             <nav className="nav">
-                {/* <img alt="Global Tracking Logo" src={globalTrackingLogo} /> */}
-                {/* <Dropdown overlay={menu} trigger={['click']}>
-                    <button style={{ color: "white", background: 'none', border: 'none', outline: 'none', cursor: 'pointer' }} className="ant-dropdown-link">
-                        {name} <DownOutlined />
-                    </button>
-                </Dropdown> */}
+                <h3>SOFT-COMPA-R</h3>
+                <p>{name || 'Admin'}</p>
             </nav>
 
 
@@ -55,23 +54,16 @@ export const NavBar = () => {
                 </NavLink>
                 <NavLink activeClassName="sidebar-active" to="/proveedores">
                     <div className="sidebar-link">
-                    <SolutionOutlined />
+                        <SolutionOutlined />
                         <p>Proveedores</p>
                     </div>
                 </NavLink>
-                <NavLink activeClassName="sidebar-active" to="/rentas">
+                <NavLink activeClassName="sidebar-active" to="/gastos-renta">
                     <div className="sidebar-link">
                         <FileDoneOutlined />
                         <p>Rentas</p>
                     </div>
                 </NavLink>
-                <NavLink activeClassName="sidebar-active" to="/mercancias">
-                    <div className="sidebar-link">
-                        <TagsOutlined />
-                        <p>Mercancias</p>
-                    </div>
-                </NavLink>
-
             </div>
 
         </>

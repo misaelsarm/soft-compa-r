@@ -1,6 +1,7 @@
 .nav {
     display: flex;
     width: 100%;
+    padding: 20px;
     justify-content: space-between;
     align-items: center;
     background-color: #0065b8;
@@ -9,10 +10,9 @@
     top: 0;
     left: 0;
     z-index: 5;
-
-    img {
-        padding: 10px;
-        width: 65px;
+    p,
+    h3 {
+        color: white;
     }
 }
 

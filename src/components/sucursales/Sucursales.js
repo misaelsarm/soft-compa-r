@@ -4,6 +4,7 @@ import { Sucursal } from './Sucursal';
 
 export const Sucursales = () => {
 
+    console.log('sucursales')
     const [sucursales, setSucursales] = useState([])
     useEffect(() => {
         loadSucursales().then((data) => {

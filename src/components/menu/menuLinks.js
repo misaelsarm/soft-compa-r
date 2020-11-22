@@ -1,8 +1,8 @@
 export const menuLinks = [
 
     {
-        route: 'pagos-renta',
-        routeName: 'Pagos de renta',
+        route: 'gastos-renta',
+        routeName: 'Gastos de renta',
         icon: 'attach_money'
     },
     {
@@ -11,8 +11,8 @@ export const menuLinks = [
         icon: 'point_of_sale'
     },
     {
-        route: 'mercancia',
-        routeName: 'Mercancia',
+        route: 'gastos-mercancia',
+        routeName: 'Gastos de mercancia',
         icon: 'local_offer'
     },
     {

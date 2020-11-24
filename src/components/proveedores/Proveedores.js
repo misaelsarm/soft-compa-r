@@ -29,9 +29,10 @@ export const Proveedores = () => {
         setVisible(true)
         setCurrentRecorrd(record)
         form.setFieldsValue({
-            concept: record.concept,
-            status: record.status,
-            paidAmount: record.paidAmount
+            name: record.name,
+            address: record.address,
+            phone: record.phone,
+            company: record.company
         })
     }
 
@@ -100,6 +101,7 @@ export const Proveedores = () => {
     const handleCancel = () => {
         setVisible(false)
         form.resetFields();
+        setSelected(false)
     }
 
     return (
@@ -114,7 +116,7 @@ export const Proveedores = () => {
                 visible={visible}
                 centered
                 onCancel={handleCancel}
-                title='Registrar nuevo proveedor'
+                title={selected ? 'Actualizar proveedor' : 'Registrar nuevo proveedor'}
                 width='50%'
                 footer={
                     [
@@ -125,20 +127,37 @@ export const Proveedores = () => {
                             form
                                 .validateFields()
                                 .then((values) => {
-                                    console.log(values)
-                                    const proveedor = {
-                                        ...values,
-                                        sucursalId: sucursalId,
-                                        id: new Date().getTime().toString(),
-                                        registerDate: new Date().getTime(),
-                                    }
+                                    if (!selected) {
+                                        console.log(values)
+                                        const proveedor = {
+                                            ...values,
+                                            sucursalId: sucursalId,
+                                            id: new Date().getTime().toString(),
+                                            registerDate: new Date().getTime(),
+                                        }
 
-                                    db.collection('proveedores').doc(proveedor.id).set(proveedor).then(() => {
-                                        form.resetFields();
-                                        setProveedores([...proveedores, proveedor])
-                                        setVisible(false)
-                                        message.success('Se registro la nueva venta de manera correcta')
-                                    })
+                                        db.collection('proveedores').doc(proveedor.id).set(proveedor).then(() => {
+                                            form.resetFields();
+                                            setProveedores([...proveedores, proveedor])
+                                            setVisible(false)
+                                            message.success('Se registro la nueva venta de manera correcta')
+                                        })
+                                    } else {
+                                        console.log(currentRecorrd.id)
+                                        db.collection('proveedores').doc(currentRecorrd.id).update({
+                                            name: values.name,
+                                            address: values.address,
+                                            phone: values.phone,
+                                            company: values.company
+                                        }).then(() => {
+                                            loadProveedores().then((data) => {
+                                                setProveedores(data.filter(proveedor => proveedor.sucursalId === sucursalId))
+                                            })
+                                            form.resetFields();
+                                            setVisible(false)
+                                            message.success('Se actualizo el proveedor de manera correcta')
+                                        })
+                                    }
                                 })
                                 .catch(({ errorFields }) => {
                                     if (!errorFields) {
@@ -146,8 +165,10 @@ export const Proveedores = () => {
                                     }
                                 });
                         }}>
-                            Registrar
-                            </Button>,
+                            {
+                                !selected ? 'Registrar' : 'Actualizar'
+                            }
+                        </Button>,
                     ]
                 }
             >

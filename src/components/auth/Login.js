@@ -84,11 +84,6 @@ export const Login = ({history}) => {
                     }
                     <Row style={{ marginTop: 10, textAlign: 'center' }}>
                         {
-                            !resetPassword && <Col offset={4} span={16} >
-                                <Button type='link' onClick={() => { setResetPassword(true) }} >¿Olvidaste tu contraseña?</Button>
-                            </Col>
-                        }
-                        {
                             resetPassword && <Col offset={4} span={16} >
                                 <Button type='link' onClick={() => { setResetPassword(false) }} >Regresar</Button>
                             </Col>

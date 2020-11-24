@@ -63,8 +63,6 @@ export const Empleados = () => {
             render: (text,record) => {
                 return (
                     <>
-                        <Button  style={{ marginRight: 10 }} icon={<EditOutlined />} type="primary" shape="circle"></Button>
-
                         <Popconfirm
                             title="¿Eliminar empleado?"
                             okText="Eliminar"

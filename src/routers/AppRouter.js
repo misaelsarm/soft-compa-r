@@ -16,8 +16,8 @@ export const AppRouter = () => {
     useEffect(() => {
         firebase.auth().onAuthStateChanged(async (user) => {
             if (user?.uid) {
-                db.collection('users').doc(user.uid).get().then((userData) => {
-                    dispatch(login(user.uid, user.displayName, userData.data().userType))
+                db.collection('empleados').doc(user.uid).get().then((userData) => {
+                    dispatch(login(user.uid, userData.data().name))
                 }).catch((e) => {
                     //setError(true)
                 })

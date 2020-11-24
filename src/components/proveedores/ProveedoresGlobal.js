@@ -1,7 +1,17 @@
 import { Table } from 'antd'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { loadProveedores } from '../../helpers/loadProveedores'
+import moment from 'moment'
 
 export const ProveedoresGlobal = () => {
+
+    const [proveedores, setProveedores] = useState([])
+
+    useEffect(() => {
+        loadProveedores().then((data) => {
+            setProveedores(data)
+        })
+    }, [])
 
     const columns = [
         {
@@ -16,32 +26,26 @@ export const ProveedoresGlobal = () => {
         },
         {
             title: 'Direccion',
-            dataIndex: 'direccion',
-            key: 'direccion',
+            dataIndex: 'address',
+            key: 'address',
         },
         {
             title: 'Empresa',
-            dataIndex: 'empresa',
-            key: 'empresa',
-        },
-        {
-            title: 'Status',
-            dataIndex: 'status',
-            key: 'status',
-            // render: text => <Tag color="blue">{text}</Tag>
+            dataIndex: 'company',
+            key: 'company',
         },
         {
             title: 'Fecha de registro',
             dataIndex: 'registerDate',
             key: 'registerDate',
-            //render: text => <>{text ? moment(text).format('lll') : 'Unknown'}</>
+            render: text => <>{text ? moment(text).format('lll') : 'Desconocida'}</>
         },
     ]
 
     return (
         <div>
             <h2>Proveedores | Global</h2>
-            <Table columns={columns}></Table>
+            <Table columns={columns} dataSource={proveedores}></Table>
         </div>
     )
 }

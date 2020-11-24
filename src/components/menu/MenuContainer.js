@@ -12,7 +12,7 @@ export const MenuContainer = ({ id, administrador, sucursal, empleados, ventas, 
             <div className="menu-grid">
                 <SucursalInfo
                     sucursal={sucursal}
-                    empleados={empleados}
+                    empleados={empleados?.length}
                     administrador={administrador}
                 />
                 <SucursalVentas ventas={ventas} />

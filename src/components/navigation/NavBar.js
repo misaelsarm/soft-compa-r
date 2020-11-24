@@ -46,10 +46,10 @@ export const NavBar = () => {
                     </div>
                 </NavLink>
 
-                <NavLink activeClassName="sidebar-active" to="/usuarios">
+                <NavLink activeClassName="sidebar-active" to="/empleados">
                     <div className="sidebar-link">
                         <TeamOutlined style={{ fontSize: 24 }} />
-                        <p>Usuarios</p>
+                        <p>Empleados</p>
                     </div>
                 </NavLink>
                 <NavLink activeClassName="sidebar-active" to="/proveedores">

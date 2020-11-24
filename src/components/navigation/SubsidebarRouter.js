@@ -5,7 +5,6 @@ import { Ganancias } from '../ganancias/Ganancias'
 import { Mercancia } from '../mercancia/Mercancia'
 import { Proveedores } from '../proveedores/Proveedores'
 import { Rentas } from '../rentas/Rentas'
-import { Usuarios } from '../usuarios/Usuarios'
 import { Subsidebar } from './Subsidebar'
 
 

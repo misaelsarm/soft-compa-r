@@ -1,37 +1,66 @@
-import React from 'react'
+import { Table } from 'antd'
+import React, { useEffect, useState } from 'react'
+import { useParams } from 'react-router-dom';
+import { loadGanancias } from '../../helpers/loadGanancias';
+import moment from 'moment'
 
 export const SucursalVentas = () => {
+
+    const hoy = moment(new Date().getTime()).format('ll')
+    console.log({ hoy })
+
+    const { sucursalId } = useParams();
+
+    const [ganancias, setGanancias] = useState([])
+
+    useEffect(() => {
+        loadGanancias().then((data) => {
+            setGanancias(data.filter(ganancia => ganancia.sucursalId === sucursalId && ganancia.saleDate === hoy))
+        })
+    }, [sucursalId, hoy])
+
+    let total = 0;
+
+    ganancias.forEach((ganancia) => {
+        total = total + +ganancia.amount
+    })
+
+
+    const columns = [
+        {
+            title: 'Id',
+            dataIndex: 'id',
+            key: 'id',
+        },
+        {
+            title: 'Fecha de venta',
+            dataIndex: 'saleDate',
+            key: 'saleDate',
+        },
+        {
+            title: 'Articulos vendidos',
+            dataIndex: 'soldItems',
+            key: 'soldItems',
+        },
+        {
+            title: 'Cantidad',
+            dataIndex: 'amount',
+            key: 'amount',
+            render: (text) => <p>${text}</p>
+        },
+        {
+            title: 'Vendedor',
+            dataIndex: 'salesman',
+            key: 'salesman',
+            // render: text => <Tag color="blue">{text}</Tag>
+        },
+    ]
+
     return (
         <div className="status">
-            <h2>Ganancias del dia</h2>
+            <h2>Ganancias del dia: ${total}</h2>
             <div className="menu-grid-item-data">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Cantidad</th>
-                            <th>Articulos vendidos</th>
-                            <th>Vendedor</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {/* {
-                            currentStatus?.map((item, index) => (
-                                <tr key={item.item}>
-                                    <td>{item.item}</td>
-                                    <td>{item.total}</td>
-                                    <td>{item.cycles}</td>
-                                    <td>{moment(item.lastUpdated).format('lll')}</td>
-                                    <td>
-                                        <Tooltip title={`Update ${item.item}`}>
-                                            <EditTwoTone twoToneColor="#cf9100" style={{ fontSize: 25 }} onClick={() => { setCurrentItem(item, index) }} />
-                                        </Tooltip>
-                                    </td>
-                                </tr>
-                            ))
-                        } */}
-                    </tbody>
-                </table>
+                <Table pagination={false} columns={columns} dataSource={ganancias}></Table>
             </div>
         </div>
     )

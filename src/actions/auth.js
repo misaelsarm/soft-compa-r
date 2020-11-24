@@ -9,10 +9,10 @@ import { message } from "antd";
 export const startLoginEmailPassword = (email, password) => {
     return (dispatch) => {
         firebase.auth().signInWithEmailAndPassword(email, password).then(({ user }) => {
-            db.collection('users').doc(user.uid).get().then((data) => {
+            db.collection('empleados').doc(user.uid).get().then((data) => {
                 const userData = data.data()
-                dispatch(login(user.uid, userData.name, userData.userType))
-                db.collection('users').doc(user.uid).update({
+                dispatch(login(user.uid, userData.name))
+                db.collection('empleados').doc(user.uid).update({
                     lastLogin: new Date().getTime()
                 })
             })
@@ -30,14 +30,13 @@ export const startLogout = () => {
 }
 
 //Acciones sincronas
-export const login = (uid, displayName, userType) => {
+export const login = (uid, name) => {
 
     return {
         type: types.login,
         payload: {
             uid,
-            displayName,
-            userType
+            name
         }
     }
 

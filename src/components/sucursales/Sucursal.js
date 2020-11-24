@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom'
+import { loadEmpleados } from '../../helpers/loadEmpleados';
 
-export const Sucursal = ({id, imageUrl, sucursal, empleados, administrador }) => {
+export const Sucursal = ({ id, imageUrl, sucursal, administrador }) => {
+
+    const [empleados, setEmpleados] = useState([])
+
+    useEffect(() => {
+        loadEmpleados().then(data => setEmpleados(data.filter(empleado => empleado.sucursal === sucursal)))
+    }, [])
+
 
     return (
         <div className="sucursal">
@@ -14,7 +22,7 @@ export const Sucursal = ({id, imageUrl, sucursal, empleados, administrador }) =>
                     <span>Sucursal:</span> <span>{sucursal}</span>
                 </div>
                 <div>
-                    <span>Empleados:</span><span>{empleados}</span>
+                    <span>Empleados:</span><span>{empleados?.length}</span>
                 </div>
                 <div>
                     <span>Administrador:</span> <span>{administrador}</span>

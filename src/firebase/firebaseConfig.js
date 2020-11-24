@@ -13,12 +13,15 @@ export const firebaseConfig = {
     appId: "1:894571217203:web:ad7791c08fbe334ef03e46"
 };
 
+
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+const secondaryApp = firebase.initializeApp(firebaseConfig, "Secondary");
 const db = firebase.firestore();
 const storage = firebase.storage();
 export {
     storage,
     db,
-    firebase
+    firebase,
+    secondaryApp
 }

@@ -9,6 +9,8 @@ export const Sucursales = () => {
 
     const [visible, setVisible] = useState(false)
     const [admins, setAdmins] = useState([])
+    const [selected, setSelected] = useState(false)
+    const [current, setCurrent] = useState({})
 
 
     const [form] = Form.useForm()
@@ -16,6 +18,7 @@ export const Sucursales = () => {
     const handleCancel = () => {
         setVisible(false)
         form.resetFields();
+        setSelected(false)
     }
 
     console.log('sucursales')
@@ -41,7 +44,17 @@ export const Sucursales = () => {
             <div className="sucursales-grid">
                 {
                     sucursales.map((sucursal) => (
-                        <Sucursal {...sucursal} />
+                        <Sucursal
+
+                            setCurrent={setCurrent}
+                            setSelected={setSelected}
+                            sucursalRecord={sucursal}
+                            form={form}
+                            visible={visible}
+                            setVisible={setVisible}
+                            setSucursales={setSucursales}
+                            sucursales={sucursales}
+                            {...sucursal} />
                     ))
                 }
             </div>
@@ -62,18 +75,36 @@ export const Sucursales = () => {
                                 .validateFields()
                                 .then((values) => {
                                     // handleRegisterAircraft(values);
-                                    console.log(values)
-                                    const sucursal = {
-                                        ...values,
-                                        empleados: [],
-                                        imageUrl: 'https://firebasestorage.googleapis.com/v0/b/soft-compa-r.appspot.com/o/restaurante.jpg?alt=media&token=f2a7b898-0160-40c2-91c3-d3096ed4d235'
+                                    if (!selected) {
+                                        console.log(values)
+                                        const sucursal = {
+                                            ...values,
+                                            empleados: [],
+                                            imageUrl: 'https://firebasestorage.googleapis.com/v0/b/soft-compa-r.appspot.com/o/restaurante.jpg?alt=media&token=f2a7b898-0160-40c2-91c3-d3096ed4d235'
+                                        }
+                                        db.collection('sucursales').add(sucursal).then(() => {
+                                            form.resetFields();
+                                            loadSucursales().then((data) => {
+                                                setSucursales(data)
+                                                console.log(data)
+                                            })
+                                            setVisible(false)
+                                            message.success('Se registro la sucursal nueva de manera correcta')
+                                        })
+                                    } else {
+                                        console.log(current)
+                                        db.collection('sucursales').doc(current.id).update({
+                                            sucursal: values.sucursal,
+                                            administrador: values.administrador
+                                        }).then(() => {
+                                            message.success('Se actualizo la sucursal de manera correcta')
+                                            setVisible(false)
+                                            loadSucursales().then((data) => {
+                                                setSucursales(data)
+                                                console.log(data)
+                                            })
+                                        })
                                     }
-                                    db.collection('sucursales').add(sucursal).then(() => {
-                                        form.resetFields();
-                                        setSucursales([...sucursales, sucursal])
-                                        setVisible(false)
-                                        message.success('Se registro la sucursal nueva de manera correcta')
-                                    })
                                 })
                                 .catch(({ errorFields }) => {
                                     if (!errorFields) {
@@ -81,8 +112,10 @@ export const Sucursales = () => {
                                     }
                                 });
                         }}>
-                            Registrar
-                            </Button>,
+                            {
+                                selected ? 'Actualizar' : 'Registrar'
+                            }
+                        </Button>,
                     ]
                 }
             >

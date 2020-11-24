@@ -87,7 +87,6 @@ export const Ganancias = () => {
                                         sucursalId: sucursalId,
                                         id: new Date().getTime().toString(),
                                         saleDate: moment(values.saleDate).format('ll'),
-
                                     }
 
                                     db.collection('ganancias').doc(venta.id).set(venta).then(() => {

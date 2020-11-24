@@ -89,7 +89,7 @@ export const Empleados = () => {
                                         console.log(user.user)
                                         db.collection('empleados').doc(empleado.id).set(empleado)
                                         setVisible(false)
-                                        message.success('Se registro la sucursal nueva de manera correcta')
+                                        message.success('Se registro el empleado de de manera correcta')
                                     })
                                 })
                                 .catch(({ errorFields }) => {

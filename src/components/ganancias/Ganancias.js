@@ -1,10 +1,10 @@
-import { Button, Col, DatePicker, Form, Input, message, Modal, Row, Select, Table } from 'antd'
+import { Button, Col, DatePicker, Form, Input, message, Modal, Popconfirm, Row, Select, Table } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { loadGanancias } from '../../helpers/loadGanancias';
 import moment from 'moment'
 import { db } from '../../firebase/firebaseConfig';
-
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 export const Ganancias = () => {
 
     const { sucursalId } = useParams();
@@ -16,6 +16,19 @@ export const Ganancias = () => {
             setGanancias(data.filter(ganancia => ganancia.sucursalId === sucursalId))
         })
     }, [sucursalId])
+
+    const [selected, setSelected] = useState(false)
+    const [currentRecorrd, setCurrentRecorrd] = useState({})
+
+    const updateModal = (record) => {
+        setSelected(true)
+        setVisible(true)
+        setCurrentRecorrd(record)
+        form.setFieldsValue({
+            soldItems: record.soldItems,
+            amount: record.amount,
+        })
+    }
 
     const columns = [
         {
@@ -45,6 +58,39 @@ export const Ganancias = () => {
             key: 'salesman',
             // render: text => <Tag color="blue">{text}</Tag>
         },
+        {
+            title: 'Acciones',
+            dataIndex: 'acciones',
+            key: 'acciones',
+            render: (text, record) => {
+                return (
+                    <>
+                        <Button onClick={() => {
+                            updateModal(record)
+                        }} style={{ marginRight: 10 }} icon={<EditOutlined />} type="primary" shape="circle"></Button>
+
+                        <Popconfirm
+                            title="¿Eliminar ganancia?"
+                            okText="Eliminar"
+                            cancelText="Cancelar"
+                            onConfirm={() => {
+                                db.collection('ganancias').doc(record.id).delete().then(() => {
+                                    setGanancias(ganancias.filter(ganancia=>ganancia.id!==record.id))
+                                    // setGastos(gastos.filter(gasto => gasto.id !== record.id))
+                                    // setEmpleados(empleados.filter(empleado => empleado.id !== record.id))
+                                    message.success('Se elimino el registro de manera correcta')
+                                }).catch(() => {
+                                    message.error('Ocurrio un problema')
+                                })
+                            }}
+                        >
+                            <Button danger shape="circle" type="primary" icon={<DeleteOutlined />}>
+                            </Button>
+                        </Popconfirm>
+                    </>
+                )
+            }
+        }
     ]
 
     const [form] = Form.useForm();
@@ -53,6 +99,7 @@ export const Ganancias = () => {
     const handleCancel = () => {
         setVisible(false)
         form.resetFields();
+        setSelected(false)
     }
 
 
@@ -68,7 +115,7 @@ export const Ganancias = () => {
                 visible={visible}
                 centered
                 onCancel={handleCancel}
-                title='Registrar nueva venta'
+                title={selected ? 'Actualizar ganancia' : 'Registrar nueva venta'}
                 width='50%'
                 footer={
                     [
@@ -82,20 +129,35 @@ export const Ganancias = () => {
                                     console.log(values)
 
                                     //TODO agregar vendedor
-                                    const venta = {
-                                        ...values,
-                                        sucursalId: sucursalId,
-                                        id: new Date().getTime().toString(),
-                                        saleDate: moment(values.saleDate).format('ll'),
-                                    }
+                                    if (!selected) {
+                                        const venta = {
+                                            ...values,
+                                            sucursalId: sucursalId,
+                                            id: new Date().getTime().toString(),
+                                            saleDate: moment(values.saleDate).format('ll'),
+                                        }
 
-                                    db.collection('ganancias').doc(venta.id).set(venta).then(() => {
-                                        form.resetFields();
-                                        // setSucursales([...sucursales, sucursal])
-                                        setGanancias([...ganancias, venta])
-                                        setVisible(false)
-                                        message.success('Se registro la nueva venta de manera correcta')
-                                    })
+                                        db.collection('ganancias').doc(venta.id).set(venta).then(() => {
+                                            form.resetFields();
+                                            // setSucursales([...sucursales, sucursal])
+                                            setGanancias([...ganancias, venta])
+                                            setVisible(false)
+                                            message.success('Se registro la nueva venta de manera correcta')
+                                        })
+                                    } else {
+                                        console.log(currentRecorrd.id)
+                                        db.collection('ganancias').doc(currentRecorrd.id).update({
+                                            soldItems: values.soldItems,
+                                            amount: values.amount,
+                                        }).then(() => {
+                                            loadGanancias().then((data) => {
+                                                setGanancias(data.filter(ganancia => ganancia.sucursalId === sucursalId))
+                                            })
+                                            form.resetFields();
+                                            setVisible(false)
+                                            message.success('Se actualizo el registro de manera correcta')
+                                        })
+                                    }
                                 })
                                 .catch(({ errorFields }) => {
                                     if (!errorFields) {
@@ -103,8 +165,10 @@ export const Ganancias = () => {
                                     }
                                 });
                         }}>
-                            Registrar
-                            </Button>,
+                            {
+                                !selected ? 'Registrar' : 'Actualizar'
+                            }
+                        </Button>,
                     ]
                 }
             >
@@ -115,20 +179,22 @@ export const Ganancias = () => {
                     name="form_in_modal"
                 >
                     <Row gutter={[24, 24]}>
-                        <Col span={8} >
-                            <Form.Item
-                                name="saleDate"
-                                label="Fecha de venta"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Campo requerido',
-                                    },
-                                ]}
-                            >
-                                <DatePicker style={{ width: '100%' }} />
-                            </Form.Item>
-                        </Col>
+                        {!selected &&
+                            <Col span={8} >
+                                <Form.Item
+                                    name="saleDate"
+                                    label="Fecha de venta"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: 'Campo requerido',
+                                        },
+                                    ]}
+                                >
+                                    <DatePicker style={{ width: '100%' }} />
+                                </Form.Item>
+                            </Col>
+                        }
                         <Col span={8} >
                             <Form.Item
                                 name="soldItems"

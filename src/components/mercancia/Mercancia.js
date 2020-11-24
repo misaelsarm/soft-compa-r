@@ -1,9 +1,10 @@
-import { Button, Col, DatePicker, Form, Input, InputNumber, message, Modal, Row, Select, Table } from 'antd'
+import { Button, Col, DatePicker, Form, Input, InputNumber, message, Modal, Popconfirm, Row, Select, Table } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { loadGastosMercancia } from '../../helpers/loadGastosMercancia';
 import moment from 'moment'
 import { db } from '../../firebase/firebaseConfig';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 
 export const Mercancia = () => {
 
@@ -16,6 +17,20 @@ export const Mercancia = () => {
             setGastos(data.filter(gasto => gasto.sucursalId === sucursalId))
         })
     }, [sucursalId])
+
+    const [selected, setSelected] = useState(false)
+    const [currentRecorrd, setCurrentRecorrd] = useState({})
+
+    const updateModal = (record) => {
+        setSelected(true)
+        setVisible(true)
+        setCurrentRecorrd(record)
+        form.setFieldsValue({
+            productName: record.productName,
+            price: record.price,
+            quantity: record.quantity
+        })
+    }
 
     const columns = [
         {
@@ -45,6 +60,37 @@ export const Mercancia = () => {
             key: 'purchaseDate',
             // render: text => <Tag color="blue">{text}</Tag>
         },
+        {
+            title: 'Acciones',
+            dataIndex: 'acciones',
+            key: 'acciones',
+            render: (text, record) => {
+                return (
+                    <>
+                        <Button onClick={() => {
+                            updateModal(record)
+                        }} style={{ marginRight: 10 }} icon={<EditOutlined />} type="primary" shape="circle"></Button>
+
+                        <Popconfirm
+                            title="¿Eliminar gasto?"
+                            okText="Eliminar"
+                            cancelText="Cancelar"
+                            onConfirm={() => {
+                                db.collection('gastos-mercancia').doc(record.id).delete().then(() => {
+                                    setGastos(gastos.filter(gasto => gasto.id !== record.id))
+                                    message.success('Se elimino al gasto de manera correcta')
+                                }).catch(() => {
+                                    message.error('Ocurrio un problema')
+                                })
+                            }}
+                        >
+                            <Button danger shape="circle" type="primary" icon={<DeleteOutlined />}>
+                            </Button>
+                        </Popconfirm>
+                    </>
+                )
+            }
+        }
     ]
 
     const [form] = Form.useForm();
@@ -53,6 +99,7 @@ export const Mercancia = () => {
     const handleCancel = () => {
         setVisible(false)
         form.resetFields();
+        setSelected(false)
     }
 
     return (
@@ -67,7 +114,7 @@ export const Mercancia = () => {
                 visible={visible}
                 centered
                 onCancel={handleCancel}
-                title='Registrar nuevo gasto de mercancia'
+                title={selected ? 'Actualizar gasto de mercancia' : 'Registrar nuevo gasto de mercancia'}
                 width='50%'
                 footer={
                     [
@@ -78,19 +125,35 @@ export const Mercancia = () => {
                             form
                                 .validateFields()
                                 .then((values) => {
-                                    console.log(values)
-                                    const gasto = {
-                                        ...values,
-                                        sucursalId: sucursalId,
-                                        id: new Date().getTime().toString(),
-                                        purchaseDate: moment(values.purchaseDate).format('ll'),
+                                    if (!selected) {
+                                        console.log(values)
+                                        const gasto = {
+                                            ...values,
+                                            sucursalId: sucursalId,
+                                            id: new Date().getTime().toString(),
+                                            purchaseDate: moment(values.purchaseDate).format('ll'),
+                                        }
+                                        db.collection('gastos-mercancia').doc(gasto.id).set(gasto).then(() => {
+                                            form.resetFields();
+                                            setGastos([...gastos, gasto])
+                                            setVisible(false)
+                                            message.success('Se registro el nuevo gasto de manera correcta')
+                                        })
+                                    } else {
+                                        console.log(currentRecorrd.id)
+                                        db.collection('gastos-mercancia').doc(currentRecorrd.id).update({
+                                            concept: values.concept,
+                                            status: values.status,
+                                            paidAmount: values.paidAmount
+                                        }).then(() => {
+                                            loadGastosMercancia().then((data) => {
+                                                setGastos(data.filter(gasto => gasto.sucursalId === sucursalId))
+                                            })
+                                            form.resetFields();
+                                            setVisible(false)
+                                            message.success('Se actualizo el gasto de manera correcta')
+                                        })
                                     }
-                                    db.collection('gastos-mercancia').doc(gasto.id).set(gasto).then(() => {
-                                        form.resetFields();
-                                        setGastos([...gastos, gasto])
-                                        setVisible(false)
-                                        message.success('Se registro el nuevo gasto de manera correcta')
-                                    })
                                 })
                                 .catch(({ errorFields }) => {
                                     if (!errorFields) {
@@ -98,8 +161,10 @@ export const Mercancia = () => {
                                     }
                                 });
                         }}>
-                            Registrar
-                            </Button>,
+                            {
+                                !selected ? 'Registrar' : 'Actualizar'
+                            }
+                        </Button>,
                     ]
                 }
             >
@@ -155,20 +220,23 @@ export const Mercancia = () => {
                                 <InputNumber style={{ width: '100%' }} />
                             </Form.Item>
                         </Col>
-                        <Col span={12} >
-                            <Form.Item
-                                name="purchaseDate"
-                                label="Fecha de compra"
-                                rules={[
-                                    {
-                                        required: true,
-                                        message: 'Campo requerido',
-                                    },
-                                ]}
-                            >
-                                <DatePicker style={{ width: '100%' }} ></DatePicker>
-                            </Form.Item>
-                        </Col>
+                        {
+                            !selected &&
+                            <Col span={12} >
+                                <Form.Item
+                                    name="purchaseDate"
+                                    label="Fecha de compra"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: 'Campo requerido',
+                                        },
+                                    ]}
+                                >
+                                    <DatePicker style={{ width: '100%' }} ></DatePicker>
+                                </Form.Item>
+                            </Col>
+                        }
                     </Row>
                 </Form>
             </Modal>

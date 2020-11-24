@@ -1,9 +1,10 @@
-import { Button, Col, Form, Input, message, Modal, Row, Select, Table } from 'antd'
+import { Button, Col, Form, Input, message, Modal, Popconfirm, Row, Select, Table } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { db } from '../../firebase/firebaseConfig'
 import { loadEmpleados } from '../../helpers/loadEmpleados'
 import { loadSucursales } from '../../helpers/sucursales'
 import moment from 'moment'
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 
 export const EmpleadosGlobal = () => {
 
@@ -40,7 +41,7 @@ export const EmpleadosGlobal = () => {
             key: 'registerDate',
             render: text => <>{text ? moment(text).format('lll') : 'Desconocida'}</>
             //render: text => <>{text ? moment(text).format('lll') : 'Unknown'}</>
-        },
+        }
     ]
 
 

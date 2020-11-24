@@ -1,18 +1,22 @@
-import { Button, Col, Form, Input, message, Modal, Row, Select, Table } from 'antd';
+import { Button, Col, Form, Input, message, Modal, Popconfirm, Row, Select, Table } from 'antd';
 import React, { useEffect, useState } from 'react'
 import { db, secondaryApp } from '../../firebase/firebaseConfig';
 import { loadEmpleados } from '../../helpers/loadEmpleados';
 import { loadSucursales } from '../../helpers/sucursales';
 import moment from 'moment'
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { useSelector } from 'react-redux';
 
 export const Empleados = () => {
+
+    const {uid} = useSelector(state => state.auth)
 
     const [empleados, setEmpleados] = useState([])
 
     useEffect(() => {
 
         loadEmpleados().then((users) => {
-            setEmpleados(users)
+            setEmpleados(users.filter(user=>user.id!==uid))
         })
         loadSucursales().then((sucursales) => {
             setSucursales(sucursales)
@@ -52,6 +56,35 @@ export const Empleados = () => {
             render: text => <>{text ? moment(text).format('lll') : 'Desconocida'}</>
             //render: text => <>{text ? moment(text).format('lll') : 'Unknown'}</>
         },
+        {
+            title: 'Acciones',
+            dataIndex: 'acciones',
+            key: 'acciones',
+            render: (text,record) => {
+                return (
+                    <>
+                        <Button  style={{ marginRight: 10 }} icon={<EditOutlined />} type="primary" shape="circle"></Button>
+
+                        <Popconfirm
+                            title="¿Eliminar empleado?"
+                            okText="Eliminar"
+                            cancelText="Cancelar"
+                            onConfirm={() => {
+                                db.collection('empleados').doc(record.id).delete().then(() => {
+                                    setEmpleados(empleados.filter(empleado => empleado.id !== record.id))
+                                    message.success('Se elimino al empleado de manera correcta')
+                                }).catch(() => {
+                                    message.error('Ocurrio un problema')
+                                })
+                            }}
+                        >
+                            <Button danger shape="circle" type="primary" icon={<DeleteOutlined />}>
+                            </Button>
+                        </Popconfirm>
+                    </>
+                )
+            }
+        }
     ]
 
     return (
@@ -79,7 +112,7 @@ export const Empleados = () => {
                                 .validateFields()
                                 .then((values) => {
                                     console.log(values)
-                                    
+
                                     secondaryApp.auth().createUserWithEmailAndPassword(values.email, 'softcompar2020').then(user => {
                                         const empleado = {
                                             ...values,
@@ -90,6 +123,9 @@ export const Empleados = () => {
                                         db.collection('empleados').doc(empleado.id).set(empleado)
                                         setVisible(false)
                                         message.success('Se registro el empleado de de manera correcta')
+                                        loadEmpleados().then((users) => {
+                                            setEmpleados(users)
+                                        })
                                     })
                                 })
                                 .catch(({ errorFields }) => {

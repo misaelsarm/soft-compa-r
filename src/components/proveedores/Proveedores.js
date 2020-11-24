@@ -1,9 +1,10 @@
-import { Button, Col, Form, Input, message, Modal, Row, Table } from 'antd'
+import { Button, Col, Form, Input, message, Modal, Popconfirm, Row, Table } from 'antd'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
 import { db } from '../../firebase/firebaseConfig';
 import moment from 'moment'
 import { loadProveedores } from '../../helpers/loadProveedores';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons'
 
 export const Proveedores = () => {
 
@@ -19,6 +20,20 @@ export const Proveedores = () => {
 
     const [form] = Form.useForm();
     const [visible, setVisible] = useState(false)
+
+    const [selected, setSelected] = useState(false)
+    const [currentRecorrd, setCurrentRecorrd] = useState({})
+
+    const updateModal = (record) => {
+        setSelected(true)
+        setVisible(true)
+        setCurrentRecorrd(record)
+        form.setFieldsValue({
+            concept: record.concept,
+            status: record.status,
+            paidAmount: record.paidAmount
+        })
+    }
 
     const columns = [
         {
@@ -47,6 +62,37 @@ export const Proveedores = () => {
             key: 'registerDate',
             render: text => <>{text ? moment(text).format('lll') : 'Desconocida'}</>
         },
+        {
+            title: 'Acciones',
+            dataIndex: 'acciones',
+            key: 'acciones',
+            render: (text, record) => {
+                return (
+                    <>
+                        <Button onClick={() => {
+                            updateModal(record)
+                        }} style={{ marginRight: 10 }} icon={<EditOutlined />} type="primary" shape="circle"></Button>
+
+                        <Popconfirm
+                            title="¿Eliminar gasto?"
+                            okText="Eliminar"
+                            cancelText="Cancelar"
+                            onConfirm={() => {
+                                db.collection('proveedores').doc(record.id).delete().then(() => {
+                                    setProveedores(proveedores.filter(proveedor => proveedor.id !== record.id))
+                                    message.success('Se elimino al gasto de manera correcta')
+                                }).catch(() => {
+                                    message.error('Ocurrio un problema')
+                                })
+                            }}
+                        >
+                            <Button danger shape="circle" type="primary" icon={<DeleteOutlined />}>
+                            </Button>
+                        </Popconfirm>
+                    </>
+                )
+            }
+        }
     ]
 
 

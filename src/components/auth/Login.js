@@ -6,7 +6,7 @@ import { useDispatch } from 'react-redux';
 import { startLoginEmailPassword } from '../../actions/auth';
 
 
-export const Login = () => {
+export const Login = ({history}) => {
 
     const dispatch = useDispatch()
 
@@ -18,6 +18,7 @@ export const Login = () => {
         } else {
             console.log('finish')
             dispatch(startLoginEmailPassword(correo, contrasena))
+            history.replace('/')
         }
     };
 
